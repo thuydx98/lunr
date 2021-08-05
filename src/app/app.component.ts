@@ -62,6 +62,7 @@ export class AppComponent {
       this.inspections = this.rawInspection;
       this.loading = false;
       this.isSingleSearch = undefined;
+      this.orderSelectedConditions();
       return;
     }
 
@@ -80,7 +81,8 @@ export class AppComponent {
 
           if (condition.key === SearchBy.EXACT) {
             // 1. keyword - Match exact
-            searchValues = this.pluginSearchExactly(keywords, this.rawInspection).concat(this.idx.search(keywords));
+            searchValues = this.pluginSearchExactly(keywords, this.rawInspection)
+            searchValues = searchValues.concat(this.idx.search(keywords));
           }
 
           if (condition.key === SearchBy.START_WITH_SEARCH_KEY) {
@@ -173,9 +175,8 @@ export class AppComponent {
     let multiIndex = 1;
     this.conditions.forEach((con) => {
       con.index = '';
-      if (con.direction === 'right' && this.isSingleSearch !== undefined) {
+      if (this.searchKey && con.direction === 'right' && this.isSingleSearch !== undefined) {
         con.index = this.isSingleSearch && con.isSingleSearch ? singleIndex++ : multiIndex++;
-        console.log(con)
       }
     });
   }
