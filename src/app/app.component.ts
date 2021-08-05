@@ -176,7 +176,7 @@ export class AppComponent {
     this.conditions.forEach((con) => {
       con.index = '';
       if (this.searchKey && con.direction === 'right' && this.isSingleSearch !== undefined) {
-        con.index = this.isSingleSearch && con.isSingleSearch ? singleIndex++ : multiIndex++;
+        con.index = con.isSingleSearch ? singleIndex++ : multiIndex++;
       }
     });
   }
