@@ -1,0 +1,31 @@
+<div nz-row>
+  <div nz-col nzSpan="18">
+    <nz-transfer [nzDataSource]="conditions" [nzRender]="renderTransfer"
+      [nzTitles]="['condition', 'selected condition']" (nzChange)="onChangeTransfer($event)"
+      [nzListStyle]="{ 'width': '50%', 'height': '100vh' }"></nz-transfer>
+    <ng-template #renderTransfer let-item>
+      <span [ngClass]="{'text-grey': isSingleSearch !== undefined && isSingleSearch !== item.isSingleSearch}" nz-tooltip
+        [nzTooltipTitle]="item.tooltip">
+        {{item.index && item.index + '. ' }}
+        {{item.title }}
+      </span>
+    </ng-template>
+  </div>
+  <div nz-col nzSpan="6">
+    <ul nz-list [nzDataSource]="inspections" nzBordered nzSize="large" [nzLoading]="loading">
+      <nz-list-header>
+        <nz-input-group [nzSuffix]="suffixIconSearch">
+          <input #searchInput nz-input [(ngModel)]="searchKey" (ngModelChange)="onChangeSearchInput()"
+            (keydown.enter)="searchInput.blur()" />
+        </nz-input-group>
+        <ng-template #suffixIconSearch>
+          <i nz-icon nzType="search"></i>
+        </ng-template>
+      </nz-list-header>
+      <li nz-list-item *ngFor="let item of inspections">
+        <span nz-tooltip [nzTooltipTitle]="item.condition" [innerHTML]="item.inspectionLineName"></span>
+      </li>
+      <nz-list-footer>Total: {{inspections.length}}</nz-list-footer>
+    </ul>
+  </div>
+</div>

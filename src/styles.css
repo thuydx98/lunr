@@ -1,0 +1,12 @@
+nz-spin {
+  height: 80vh;
+  overflow-y: auto;
+}
+
+.text-danger {
+  color: red;
+}
+
+.text-grey {
+  color: lightgray;
+}
