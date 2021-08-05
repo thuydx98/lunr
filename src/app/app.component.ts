@@ -53,12 +53,12 @@ export class AppComponent {
   private onSearch = (searchText: string) => {
     // remove all *+~^:-, replace multiple-space
     this.loading = true;
-    let keywords = searchText
+    searchText = searchText
       ?.replace(/\s\s+/g, ' ')
       .replace(/[*+~^:-]/g, '')
       .trim();
 
-    if (!keywords || keywords === '') {
+    if (!searchText || searchText === '') {
       this.inspections = this.rawInspection;
       this.loading = false;
       this.isSingleSearch = undefined;
@@ -66,14 +66,14 @@ export class AppComponent {
       return;
     }
 
-    if (keywords !== undefined) {
+    if (searchText !== undefined) {
       let searchKey;
       let result: any = [];
-
       const cons = this.conditions.filter((item) => item.direction === 'right');
 
       cons.forEach((condition) => {
         let searchValues = [];
+        let keywords = searchText;
         const message = SearchFunction.find((i) => i.key == condition.key)?.title;
 
         if (keywords.split(' ').length === 1) {
@@ -81,7 +81,7 @@ export class AppComponent {
 
           if (condition.key === SearchBy.EXACT) {
             // 1. keyword - Match exact
-            searchValues = this.pluginSearchExactly(keywords, this.rawInspection)
+            searchValues = this.pluginSearchExactly(keywords, this.rawInspection);
             searchValues = searchValues.concat(this.idx.search(keywords));
           }
 
