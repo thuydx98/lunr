@@ -30,7 +30,7 @@ jobs:
       uses: docker/build-push-action@v2
       with:
         push: true
-        tags: index.docker.io/${{ secrets.AzureAppService_ContainerUsername_00ec7499801f41a99b5890a50dd36d13 }}/thuydx9598/lunr:${{ github.sha }}
+        tags: thuydx9598/lunr:${{ github.sha }}
         file: ./Dockerfile
 
   deploy:
@@ -48,4 +48,4 @@ jobs:
         app-name: 'lunr'
         slot-name: 'production'
         publish-profile: ${{ secrets.AzureAppService_PublishProfile_7089ff5ae7af4b96a928cfa0f33dbffd }}
-        images: 'index.docker.io/${{ secrets.AzureAppService_ContainerUsername_00ec7499801f41a99b5890a50dd36d13 }}/thuydx9598/lunr:${{ github.sha }}'
+        images: 'thuydx9598/lunr:${{ github.sha }}'
