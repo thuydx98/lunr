@@ -154,7 +154,7 @@ export class AppComponent {
           const inspection = Object.assign({}, insp);
           if (inspection) {
             inspection.condition = item.condition;
-            inspection.inspectionLineName = `<span class="text-danger">${item.score === 100 ? item.score : item.score.toFixed(2)}</span>: ` + inspection.inspectionLineName;
+            inspection.inspectionLineName = `<b>${item.score === 100 ? item.score : item.score.toFixed(2)}</b>: ` + inspection.inspectionLineName;
 
             for (const [key] of Object.entries(item.matchData.metadata)) {
               inspection.inspectionLineName = inspection.inspectionLineName.replace(new RegExp(key, 'i'), `<b>$&</b>`);
