@@ -3,6 +3,7 @@ import { InspectionService } from './inspection.service';
 import { TransferItem } from 'ng-zorro-antd/transfer';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import * as lunr from 'lunr';
+import Fuse from 'fuse.js';
 import { SearchOption } from './models/app.model';
 import { getSimilarityBasedOnDistance, searchExactly } from './app.const';
 
@@ -19,6 +20,7 @@ export class AppComponent {
   rawInspection: any[] = [];
   inspections: any[] = [];
   idx: any;
+  fuse: any;
   options: SearchOption = new SearchOption();
 
   constructor(private appSettingsService: InspectionService, private modal: NzModalService) {}
@@ -29,6 +31,7 @@ export class AppComponent {
       this.rawInspection = data;
       this.loading = false;
       this.initLunrIndex(data);
+      this.initFuse(data);
     });
   }
 
@@ -68,7 +71,7 @@ export class AppComponent {
     this.loading = true;
     const patterns = this.patterns.filter((item) => item.direction === 'right');
 
-    if (!this.searchKey || (patterns.length == 0 && !this.options.useCustomSearch)) {
+    if (!this.searchKey || (patterns.length == 0 && !this.options.useCustomSearch && !this.options.useUpperWord && !this.options.useFuse)) {
       this.inspections = this.rawInspection;
       this.loading = false;
       return;
@@ -79,8 +82,17 @@ export class AppComponent {
 
     if (this.options.useCustomSearch) {
       const isSingle = searchKey.split(' ').length === 1;
-      result = result.concat(searchExactly(searchKey, this.rawInspection, isSingle).map((item: any) => ({ ...item, tooltip: 'CSE' })));
+      result = result.concat(searchExactly(searchKey, this.rawInspection, isSingle).map((item: any) => ({ ...item, tooltip: 'custom search', plugin: 'CSE' })));
     }
+
+    if (this.options.useUpperWord) {
+      const input = '+' + [...searchKey].join('* +') + '*';
+      result = result.concat(this.idx.search(input).map((item: any) => ({ ...item, tooltip: input, plugin: 'FWU' })));
+    }
+
+    // if (this.options.useFuse) {
+    //   result = result.concat(this.searchFuse(searchKey));
+    // }
 
     patterns.forEach((pattern) => {
       const tooltip = pattern.title;
@@ -101,13 +113,14 @@ export class AppComponent {
 
         const inspection = Object.assign({}, insp);
         if (inspection) {
-          inspection.condition = item.condition;
-          for (const [key] of Object.entries(item.matchData.metadata)) {
-            inspection.inspectionLineName = inspection.inspectionLineName.replace(new RegExp(key, 'i'), `<b>$&</b>`);
+          if (item.plugin !== 'FUSE') {
+            for (const [key] of Object.entries(item.matchData.metadata)) {
+              inspection.inspectionLineName = inspection.inspectionLineName.replace(new RegExp(key, 'i'), `<b>$&</b>`);
+            }
           }
 
           inspection.score = +item.score.toFixed(3);
-          inspection.inspectionLineName = `<span class="text-danger">${item.score === 100 ? 'CSE' : item.score.toFixed(3)}</span>: ` + inspection.inspectionLineName;
+          inspection.inspectionLineName = `<span class="text-danger">` + (item.plugin ? item.plugin + ' ' : '') + (item.score < 100 ? +item.score.toFixed(3).toString() : '') + `</span>: ` + inspection.inspectionLineName;
         }
 
         return inspection;
@@ -215,5 +228,34 @@ export class AppComponent {
         this.add(ins);
       });
     });
+  }
+
+  private initFuse(inspections: any): void {
+    this.fuse = new Fuse(inspections, {
+      isCaseSensitive: true,
+      includeScore: true,
+      shouldSort: true,
+      includeMatches: true,
+      findAllMatches: true,
+      // minMatchCharLength: 1,
+      // location: 0,
+      threshold: 0.6,
+      // distance: 100,
+      // useExtendedSearch: false,
+      // ignoreLocation: false,
+      // ignoreFieldNorm: false,
+      keys: ['inspectionLineName'],
+    });
+  }
+
+  private searchFuse(searchKey: string): any[] {
+    const result = this.fuse.search(searchKey);
+    debugger;
+    return result.map((item: any) => ({
+      ref: item.item.inspectionId,
+      tooltip: 'Fuse.js',
+      score: item.score,
+      plugin: 'FUS',
+    }));
   }
 }

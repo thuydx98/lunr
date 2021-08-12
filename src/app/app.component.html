@@ -38,9 +38,17 @@
         <label [(ngModel)]="options.useCustomSearch" (ngModelChange)="onSearch()" nz-checkbox class="pt-5">
           Use custom search exact for multi language (not use ext lib) (<span class="text-danger">CSE</span>)
         </label>
-        <label nz-checkbox nzDisabled class="pt-5">Use lunr languages (up coming)</label>
-        <label nz-checkbox nzDisabled class="pt-5">Search with exact number value (up coming)</label>
-        <!-- <label nz-checkbox nzDisabled>Eliminate non-semantic words (up coming)</label> -->
+        <!-- <label [(ngModel)]="options.useFuse" (ngModelChange)="onSearch()" nz-checkbox class="pt-5">
+          Use Fuse.js fuzzy search library https://fusejs.io (<span class="text-danger">FUS</span>)
+        </label> -->
+        <label [(ngModel)]="options.useUpperWord" (ngModelChange)="onSearch()" nz-checkbox class="pt-5">
+          Search by first letter of each word in uppercase (<span class="text-danger">FWU</span>)
+        </label>
+        <label nz-checkbox class="pt-5">
+          Skip fuzzy search when keyword less or equal than 3 characters
+        </label>
+        <label nz-checkbox nzDisabled class="pt-5">Use lunr languages</label> <br>
+        <label nz-checkbox nzDisabled class="pl-3 pt-5">Search with exact number value</label>
       </div>
       <div nz-col nzSpan="12">
         <div>Score: </div>
