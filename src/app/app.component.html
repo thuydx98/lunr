@@ -1,31 +1,42 @@
 <div nz-row>
+  <div nz-col nzSpan="24">
+    <nz-input-group nzSize="large" [nzAddOnAfter]="suffixIconButton">
+      <input #searchInput nz-input [(ngModel)]="searchKey" (ngModelChange)="onChangeSearchInput()"
+        (keydown.enter)="searchInput.blur()" placeholder="Search key..." />
+    </nz-input-group>
+    <ng-template #suffixIconButton>
+      <button nz-button nzType="primary" nzSearch (click)="onClearSearch()"><i nz-icon nzType="clear"
+          nzTheme="outline"></i></button>
+    </ng-template>
+  </div>
+</div>
+
+<div nz-row>
   <div nz-col nzSpan="18">
-    <nz-transfer [nzDataSource]="conditions" [nzRender]="renderTransfer"
-      [nzTitles]="['condition', 'selected condition']" (nzChange)="onChangeTransfer($event)"
-      [nzListStyle]="{ 'width': '50%', 'height': '100vh' }"></nz-transfer>
+    <nz-transfer [nzDataSource]="patterns" [nzRender]="renderTransfer"
+      [nzTitles]="['suggested pattern', 'searched pattern']" (nzChange)="onChangeTransfer($event)"
+      [nzListStyle]="{ 'width': '50%', 'height': '50vh' }"></nz-transfer>
     <ng-template #renderTransfer let-item>
-      <span [ngClass]="{'text-grey': isSingleSearch !== undefined && isSingleSearch !== item.isSingleSearch}" nz-tooltip
-        [nzTooltipTitle]="item.tooltip">
+      <span>
         {{item.index && item.index + '. ' }}
         {{item.title }}
       </span>
     </ng-template>
+
+    <div nz-row>
+      <nz-space nz-col nzSpan="12">
+        <label nz-checkbox class="pl-3">Use Levenshtein Distance to sort inspection with same score</label>
+        <label nz-checkbox>Use search exact for multi language from js (not ext lib)</label>
+      </nz-space>
+    </div>
   </div>
+
   <div nz-col nzSpan="6">
     <ul nz-list [nzDataSource]="inspections" nzBordered nzSize="large" [nzLoading]="loading">
-      <nz-list-header>
-        <nz-input-group [nzSuffix]="suffixIconSearch">
-          <input #searchInput nz-input [(ngModel)]="searchKey" (ngModelChange)="onChangeSearchInput()"
-            (keydown.enter)="searchInput.blur()" />
-        </nz-input-group>
-        <ng-template #suffixIconSearch>
-          <i nz-icon nzType="search"></i>
-        </ng-template>
-      </nz-list-header>
       <li nz-list-item *ngFor="let item of inspections">
-        <span nz-tooltip [nzTooltipTitle]="item.condition" [innerHTML]="item.inspectionLineName"></span>
+        <span nz-tooltip [nzTooltipTitle]="item.tooltip" [innerHTML]="item.inspectionLineName"></span>
       </li>
-      <nz-list-footer>Total: {{inspections.length}}</nz-list-footer>
+      <nz-list-footer> Result: {{inspections.length}} items </nz-list-footer>
     </ul>
   </div>
 </div>

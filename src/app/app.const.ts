@@ -1,76 +1,65 @@
-export enum SearchBy {
-  EXACT,
-  START_WITH_SEARCH_KEY,
-  START_WITH_FIRST_LETTER,
-  CONTAINING_SEARCH_KEY,
-  EACH_LETTER_IN_SEARCH_KEY,
+export const searchExactly = (keywords: string, source: any, isSingleWord = true): any[] => {
+  const result: any = [];
+  const key = keywords.toLowerCase();
+  const exactKeywordRegex = isSingleWord ? new RegExp(`[\\s]${key}$|^${key}[\\s]|[\\s]${key}[\\s]|^${key}$`) : new RegExp(`${key}`);
+  source.forEach((i: any) => {
+    const name = i.inspectionLineName.toLowerCase();
+    if (exactKeywordRegex.test(name)) {
+      let index = 0;
+      let startIndex = 0;
+      const position = [];
+      while ((index = name.indexOf(key, startIndex)) > -1) {
+        position.push(index);
+        startIndex = index + keywords.length;
+      }
+      const metadata: any = {};
+      metadata[key] = { inspectionLineName: { position } };
+      result.push({
+        matchData: { metadata },
+        ref: i.inspectionId,
+        score: 100,
+      });
+    }
+  });
+  return result;
+};
 
-  MULTI_EXACT,
-  MULTI_START_WITH_SEARCH_KEY,
-  MULTI_CONTAIN_ALL_KEY,
-  MULTI_START_AND_CONTAIN_ALL_KEY_WORD,
-  MULTI_CONTAIN_START_OF_ALL_KEY,
-}
+const getLevenshteinDistance = (s1: string, s2: string) => {
+  // https://stackoverflow.com/questions/10473745/compare-strings-javascript-return-of-likely
+  s1 = s1.toLowerCase();
+  s2 = s2.toLowerCase();
 
-export const SearchFunction = [
-  {
-    key: SearchBy.EXACT,
-    title: 'Single: keyword',
-    isSingleSearch: true,
-    tooltip: 'Match exact',
-  },
-  {
-    key: SearchBy.START_WITH_SEARCH_KEY,
-    title: 'Single: keyword*',
-    isSingleSearch: true,
-    tooltip: 'Start with search key',
-  },
-  {
-    key: SearchBy.START_WITH_FIRST_LETTER,
-    title: 'Single: +keyword[0]* +keyword~1 || +keyword[0]* +keyword~1',
-    isSingleSearch: true,
-    tooltip: 'Start with first letter, allow 2 differences',
-  },
-  {
-    key: SearchBy.CONTAINING_SEARCH_KEY,
-    title: 'Single: *keyword*',
-    isSingleSearch: true,
-    tooltip: 'Match words containing (not start with)',
-  },
-  {
-    key: SearchBy.EACH_LETTER_IN_SEARCH_KEY,
-    title: 'Single: k*e*y*w*o*r*d',
-    isSingleSearch: true,
-    tooltip: 'Match words by each letter, starting with first letter',
-  },
-  {
-    key: SearchBy.MULTI_EXACT,
-    title: 'Multiple: Match exact',
-    isSingleSearch: false,
-    tooltip: 'Match exact',
-  },
-  {
-    key: SearchBy.MULTI_START_WITH_SEARCH_KEY,
-    title: 'Multiple: each key word*',
-    isSingleSearch: false,
-    tooltip: 'Start with keywords',
-  },
-  {
-    key: SearchBy.MULTI_CONTAIN_ALL_KEY,
-    title: 'Multiple: +each +key +words',
-    isSingleSearch: false,
-    tooltip: 'Contains all keywords',
-  },
-  {
-    key: SearchBy.MULTI_START_AND_CONTAIN_ALL_KEY_WORD,
-    title: 'Multiple: +each +key +words*',
-    isSingleSearch: false,
-    tooltip: 'Contains all keywords except last & Start with last keyword',
-  },
-  {
-    key: SearchBy.MULTI_CONTAIN_START_OF_ALL_KEY,
-    title: 'Multiple: each* key* words*',
-    isSingleSearch: false,
-    tooltip: 'Maybe start with some keywords',
-  },
-];
+  const costs = new Array();
+  for (let i = 0; i <= s1.length; i++) {
+    let lastValue = i;
+    for (let j = 0; j <= s2.length; j++) {
+      if (i == 0) costs[j] = j;
+      else {
+        if (j > 0) {
+          let newValue = costs[j - 1];
+          if (s1.charAt(i - 1) != s2.charAt(j - 1)) newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1;
+          costs[j - 1] = lastValue;
+          lastValue = newValue;
+        }
+      }
+    }
+    if (i > 0) costs[s2.length] = lastValue;
+  }
+  return costs[s2.length];
+};
+
+export const getSimilarityBasedOnDistance = (s1: string, s2: string) => {
+  let longer = s1;
+  let shorter = s2;
+  if (s1.length < s2.length) {
+    longer = s2;
+    shorter = s1;
+  }
+  const longerLength = longer.length;
+  if (longerLength == 0) {
+    return 1.0;
+  }
+  return (longerLength - getLevenshteinDistance(longer, shorter)) / longerLength;
+  // return (longerLength - this.getLevenshteinDistance(longer, shorter)) / parseFloat(longerLength);
+};
+
