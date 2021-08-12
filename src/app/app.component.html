@@ -13,21 +13,46 @@
 
 <div nz-row>
   <div nz-col nzSpan="18">
-    <nz-transfer [nzDataSource]="patterns" [nzRender]="renderTransfer"
+    <nz-transfer [nzDataSource]="patterns" [nzRender]="renderTransfer" [nzFooter]="footerTransfer"
       [nzTitles]="['suggested pattern', 'searched pattern']" (nzChange)="onChangeTransfer($event)"
       [nzListStyle]="{ 'width': '50%', 'height': '50vh' }"></nz-transfer>
     <ng-template #renderTransfer let-item>
       <span>
-        {{item.index && item.index + '. ' }}
         {{item.title }}
+        <button nz-button nzType="link" [nzSize]="'small'" nzDanger (click)="onDeletePattern(item)"><i nz-icon
+            nzType="delete"></i></button>
       </span>
+    </ng-template>
+    <ng-template #footerTransfer let-direction>
+      <button [disabled]="!searchKey" nz-button (click)="onAddPattern(direction)" [nzSize]="'small'" nzType="primary"
+        style="float: right; margin: 5px;">
+        Add
+      </button>
     </ng-template>
 
     <div nz-row>
-      <nz-space nz-col nzSpan="12">
-        <label nz-checkbox class="pl-3">Use Levenshtein Distance to sort inspection with same score</label>
-        <label nz-checkbox>Use search exact for multi language from js (not ext lib)</label>
-      </nz-space>
+      <div nz-col nzSpan="12">
+        <label [(ngModel)]="options.useLevenshtein" (ngModelChange)="onSearch()" nz-checkbox class="pl-3 pt-5">
+          Use Levenshtein Distance to sort inspection with same score
+        </label>
+        <label [(ngModel)]="options.useCustomSearch" (ngModelChange)="onSearch()" nz-checkbox class="pt-5">
+          Use custom search exact for multi language (not use ext lib) (<span class="text-danger">CSE</span>)
+        </label>
+        <label nz-checkbox nzDisabled class="pt-5">Use lunr languages (up coming)</label>
+        <label nz-checkbox nzDisabled class="pt-5">Search with exact number value (up coming)</label>
+        <!-- <label nz-checkbox nzDisabled>Eliminate non-semantic words (up coming)</label> -->
+      </div>
+      <div nz-col nzSpan="12">
+        <div>Score: </div>
+        <nz-slider nzRange [nzMin]="options.scoreRange[0]" [nzMax]="options.scoreRange[1]" [nzStep]="0.001"
+          [(ngModel)]="options.scoreSelected" [nzDisabled]="inspections.length == rawInspection.length"
+          [nzTooltipVisible]="'always'" (nzOnAfterChange)="onSearch(true)">
+        </nz-slider>
+
+        <label [(ngModel)]="options.isSortScore" (ngModelChange)="onSearch(true)" nz-checkbox class="pl-3">
+          Sort by score ignore order of patterns
+        </label>
+      </div>
     </div>
   </div>
 
