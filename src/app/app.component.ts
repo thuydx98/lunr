@@ -82,7 +82,7 @@ export class AppComponent {
 
     if (this.options.useCustomSearch) {
       const isSingle = searchKey.split(' ').length === 1;
-      result = result.concat(searchExactly(searchKey, this.rawInspection, isSingle).map((item: any) => ({ ...item, tooltip: 'custom search', plugin: 'CSE' })));
+      result = result.concat(searchExactly(searchKey, this.rawInspection, isSingle).map((item: any) => ({ ...item, tooltip: 'CSE: custom search exact', plugin: 'CSE' })));
     }
 
     if (this.options.useUpperWord && searchKey === searchKey.toUpperCase()) {
@@ -120,6 +120,7 @@ export class AppComponent {
           }
 
           inspection.score = +item.score.toFixed(3);
+          inspection.tooltip = item.tooltip;
           inspection.inspectionLineName = `<span class="text-danger">` + (item.plugin ? item.plugin + ' ' : '') + (item.score < 100 ? +item.score.toFixed(3).toString() : '') + `</span>: ` + inspection.inspectionLineName;
         }
 
@@ -132,7 +133,7 @@ export class AppComponent {
           const ins1 = this.inspections[i];
           const ins2 = this.inspections[j];
 
-          if (ins1.score !== ins2.score) break;
+          if (ins1.score !== ins2.score || ins1.tooltip !== ins2.tooltip) break;
 
           if (getSimilarityBasedOnDistance(this.searchKey, ins2.inspectionLineName) > getSimilarityBasedOnDistance(this.searchKey, ins1.inspectionLineName)) {
             const temp = this.inspections[i];
