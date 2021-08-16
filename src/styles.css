@@ -11,6 +11,10 @@ nz-spin {
   color: lightgray;
 }
 
+.ml-3 {
+  margin-left: 8px;
+}
+
 .pl-3 {
   padding-left: 8px;
 }
