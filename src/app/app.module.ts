@@ -15,9 +15,9 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzListModule } from 'ng-zorro-antd/list';
 import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
-import { NzSliderModule } from 'ng-zorro-antd/slider';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzModalModule } from 'ng-zorro-antd/modal';
+import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
 
 registerLocaleData(en);
 
@@ -35,9 +35,9 @@ registerLocaleData(en);
     NzListModule,
     NzToolTipModule,
     NzCheckboxModule,
-    NzSliderModule,
     NzButtonModule,
     NzModalModule,
+    NzInputNumberModule,
   ],
   providers: [
     { provide: NZ_I18N, useValue: en_US },

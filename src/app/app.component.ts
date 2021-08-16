@@ -85,7 +85,7 @@ export class AppComponent {
       result = result.concat(searchExactly(searchKey, this.rawInspection, isSingle).map((item: any) => ({ ...item, tooltip: 'custom search', plugin: 'CSE' })));
     }
 
-    if (this.options.useUpperWord) {
+    if (this.options.useUpperWord && searchKey === searchKey.toUpperCase()) {
       const input = '+' + [...searchKey].join('* +') + '*';
       result = result.concat(this.idx.search(input).map((item: any) => ({ ...item, tooltip: input, plugin: 'FWU' })));
     }
@@ -127,22 +127,26 @@ export class AppComponent {
       });
 
     if (this.options.useLevenshtein) {
-      this.inspections = this.inspections.sort((ins1: any, ins2: any) => {
-        let diff = ins2.score - ins1.score;
-        if (diff === 0) {
-          diff = getSimilarityBasedOnDistance(this.searchKey, ins2.inspectionLineName) - getSimilarityBasedOnDistance(this.searchKey, ins1.inspectionLineName);
+      for (let i = 0; i < this.inspections.length - 1; i++) {
+        for (let j = i + 1; j < this.inspections.length; j++) {
+          const ins1 = this.inspections[i];
+          const ins2 = this.inspections[j];
+
+          if (ins1.score !== ins2.score) break;
+
+          if (getSimilarityBasedOnDistance(this.searchKey, ins2.inspectionLineName) > getSimilarityBasedOnDistance(this.searchKey, ins1.inspectionLineName)) {
+            const temp = this.inspections[i];
+            this.inspections[i] = ins2;
+            this.inspections[j] = temp;
+          }
         }
-        return diff;
-      });
+      }
     }
 
     if (!isChangeScore) {
-      const minScore = this.inspections.reduce((min, item) => (min < item.score ? min : item.score), 0);
-      const maxScore = this.inspections.reduce((max, item) => (max > item.score ? max : item.score), 0);
-      this.options.scoreRange = [minScore, maxScore];
-      this.options.scoreSelected = [minScore, maxScore];
+      this.options.minScore = 0;
     } else {
-      this.inspections = this.inspections.filter((item) => this.options.scoreSelected[0] <= item.score && item.score <= this.options.scoreSelected[1]);
+      this.inspections = this.inspections.filter((item) => this.options.minScore <= item.score);
     }
 
     if (this.options.isSortScore) {

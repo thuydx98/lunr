@@ -51,13 +51,15 @@
         <label nz-checkbox nzDisabled class="pl-3 pt-5">Search with exact number value</label>
       </div>
       <div nz-col nzSpan="12">
-        <div>Score: </div>
-        <nz-slider nzRange [nzMin]="options.scoreRange[0]" [nzMax]="options.scoreRange[1]" [nzStep]="0.001"
-          [(ngModel)]="options.scoreSelected" [nzDisabled]="inspections.length == rawInspection.length"
-          [nzTooltipVisible]="'always'" (nzOnAfterChange)="onSearch(true)">
-        </nz-slider>
+        <div class="pt-5 pl-3">
+          Min Score:
+          <nz-input-number [(ngModel)]="options.minScore" [nzMin]="0" [nzStep]="0.001"
+            [nzDisabled]="inspections.length == rawInspection.length" (ngModelChange)="onSearch(true)" class="pl-3">
+          </nz-input-number>
+        </div>
 
-        <label [(ngModel)]="options.isSortScore" (ngModelChange)="onSearch(true)" nz-checkbox class="pl-3">
+
+        <label [(ngModel)]="options.isSortScore" (ngModelChange)="onSearch(true)" nz-checkbox class="pt-5 pl-3">
           Sort by score ignore order of patterns
         </label>
       </div>

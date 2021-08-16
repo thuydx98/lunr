@@ -4,6 +4,5 @@ export class SearchOption {
   public useUpperWord = false;
   public useFuse = false;
   public isSortScore = false;
-  public scoreRange = [0, 3];
-  public scoreSelected = [0.5, 1];
+  public minScore = 0;
 }
