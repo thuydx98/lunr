@@ -24,7 +24,7 @@ export const searchExactly = (keywords: string, source: any, isSingleWord = true
   return result;
 };
 
-const getLevenshteinDistance = (s1: string, s2: string) => {
+const editDistance = (s1: string, s2: string) => {
   // https://stackoverflow.com/questions/10473745/compare-strings-javascript-return-of-likely
   s1 = s1.toLowerCase();
   s2 = s2.toLowerCase();
@@ -48,7 +48,7 @@ const getLevenshteinDistance = (s1: string, s2: string) => {
   return costs[s2.length];
 };
 
-export const getSimilarityBasedOnDistance = (s1: string, s2: string) => {
+export const similarity = (s1: string, s2: string) => {
   let longer = s1;
   let shorter = s2;
   if (s1.length < s2.length) {
@@ -59,7 +59,52 @@ export const getSimilarityBasedOnDistance = (s1: string, s2: string) => {
   if (longerLength == 0) {
     return 1.0;
   }
-  return (longerLength - getLevenshteinDistance(longer, shorter)) / longerLength;
+  return (longerLength - editDistance(longer, shorter)) / longerLength;
   // return (longerLength - this.getLevenshteinDistance(longer, shorter)) / parseFloat(longerLength);
 };
 
+export const convertToHex = (input: string) => {
+  let hex, i;
+  let result = '';
+  for (i = 0; i < input.length; i++) {
+    hex = input.charCodeAt(i).toString(16);
+    result += ('000' + hex).slice(-4);
+  }
+
+  return result;
+};
+
+export const SPECIAL_CHARACTERS = [
+  {
+    key: '"',
+    value: convertToHex('"')
+  },
+  {
+    key: '-',
+    value: convertToHex('-')
+  },
+  {
+    key: '+',
+    value: convertToHex('+')
+  },
+  {
+    key: '*',
+    value: convertToHex('*')
+  },
+  {
+    key: '~',
+    value: convertToHex('~')
+  },
+  {
+    key: '^',
+    value: convertToHex('^')
+  },
+  {
+    key: ':',
+    value: convertToHex(':')
+  },
+  {
+    key: `'`,
+    value: convertToHex(`'`)
+  }
+];

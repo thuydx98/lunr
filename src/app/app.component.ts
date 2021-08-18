@@ -5,7 +5,7 @@ import { NzModalService } from 'ng-zorro-antd/modal';
 import * as lunr from 'lunr';
 import Fuse from 'fuse.js';
 import { SearchOption } from './models/app.model';
-import { getSimilarityBasedOnDistance, searchExactly } from './app.const';
+import { similarity, searchExactly, SPECIAL_CHARACTERS } from './app.const';
 
 @Component({
   selector: 'app-root',
@@ -13,6 +13,7 @@ import { getSimilarityBasedOnDistance, searchExactly } from './app.const';
   styleUrls: ['./app.component.css'],
 })
 export class AppComponent {
+  SPECIAL_CHARACTERS = SPECIAL_CHARACTERS;
   timeoutID: any;
   searchKey = '';
   loading = true;
@@ -31,7 +32,7 @@ export class AppComponent {
       this.rawInspection = data;
       this.loading = false;
       this.initLunrIndex(data);
-      this.initFuse(data);
+      // this.initFuse(data);
     });
   }
 
@@ -55,12 +56,14 @@ export class AppComponent {
 
     this.timeoutID = setTimeout(() => {
       this.inspections = this.rawInspection;
+      this.options.useLevenshtein = true;
       this.generateSearchPatterns(this.searchKey);
       this.onSearch();
     }, 500);
   }
 
   onClearSearch() {
+    this.options.useLevenshtein = true;
     this.searchKey = '';
     this.patterns = [];
     this.inspections = this.rawInspection;
@@ -113,14 +116,16 @@ export class AppComponent {
 
         const inspection = Object.assign({}, insp);
         if (inspection) {
+          inspection.score = +item.score.toFixed(3);
+          inspection.tooltip = item.tooltip;
+          inspection.rawName = inspection.inspectionLineName;
+
           if (item.plugin !== 'FUSE') {
             for (const [key] of Object.entries(item.matchData.metadata)) {
               inspection.inspectionLineName = inspection.inspectionLineName.replace(new RegExp(key, 'i'), `<b>$&</b>`);
             }
           }
 
-          inspection.score = +item.score.toFixed(3);
-          inspection.tooltip = item.tooltip;
           inspection.inspectionLineName = `<span class="text-danger">` + (item.plugin ? item.plugin + ' ' : '') + (item.score < 100 ? +item.score.toFixed(3).toString() : '') + `</span>: ` + inspection.inspectionLineName;
         }
 
@@ -135,7 +140,7 @@ export class AppComponent {
 
           if (ins1.score !== ins2.score || ins1.tooltip !== ins2.tooltip) break;
 
-          if (getSimilarityBasedOnDistance(this.searchKey, ins2.inspectionLineName) > getSimilarityBasedOnDistance(this.searchKey, ins1.inspectionLineName)) {
+          if (similarity(this.searchKey, ins2.rawName) > similarity(this.searchKey, ins1.rawName)) {
             const temp = this.inspections[i];
             this.inspections[i] = ins2;
             this.inspections[j] = temp;
@@ -187,29 +192,38 @@ export class AppComponent {
   }
 
   private generateSearchPatterns(searchKey: string): void {
-    searchKey = searchKey
-      ?.replace(/\s\s+/g, ' ')
-      .replace(/[*+~^:-]/g, '')
-      .trim();
+    searchKey = searchKey?.replace(/\s\s+/g, ' ').trim();
 
     if (!searchKey || searchKey === '') {
       return;
     }
+
+    SPECIAL_CHARACTERS.forEach((item) => {
+      searchKey = searchKey.split(item.key).join(item.value);
+    });
 
     const patterns: any = [];
     if (searchKey.split(' ').length === 1) {
       patterns.push({ title: searchKey });
       patterns.push({ title: searchKey + '*' });
       patterns.push({ title: searchKey + '~1' });
+
+      /** removed in new version
       patterns.push({ title: '+' + searchKey[0] + '* +' + searchKey + '~1' });
       patterns.push({ title: '+' + searchKey[0] + '* +' + searchKey + '~2' });
       patterns.push({ title: '*' + searchKey + '*' });
       patterns.push({ title: [...searchKey].join('*') + '*' });
+       */
     } else {
-      patterns.push({ title: '+' + searchKey.split(' ').join(' +') });
+      const words = searchKey.split(' ');
+      patterns.push({ title: '+' + words.join(' +') });
+      patterns.push({ title: '+' + words.slice(0, words.length - 1).join(' +') + ' ' + words[words.length - 1] });
+
+      /** removed in new version
       patterns.push({ title: '+' + searchKey.split(' ').join(' +') + '*' });
       patterns.push({ title: searchKey.split(' ').join('* ') + '*' });
       patterns.push({ title: searchKey + '*' });
+       */
     }
 
     this.patterns = patterns;
@@ -219,7 +233,6 @@ export class AppComponent {
     const trimmer = function (token: any) {
       return token.update(function (s: any) {
         return s;
-        // return s.replace(/^\W+/, '').replace(/\W+$/, '');
       });
     };
 
@@ -230,7 +243,12 @@ export class AppComponent {
       this.field('inspectionLineName');
       this.metadataWhitelist = ['position', 'tokenLength'];
       inspections.forEach((ins: any) => {
-        this.add(ins);
+        let inspectionLineName = ins.inspectionLineName;
+        SPECIAL_CHARACTERS.forEach((item) => {
+          inspectionLineName = inspectionLineName.split(item.key).join(item.value);
+        });
+
+        this.add({ ...ins, inspectionLineName });
       });
     });
   }

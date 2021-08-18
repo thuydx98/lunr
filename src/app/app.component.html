@@ -47,7 +47,16 @@
         <label nz-checkbox class="pt-5">
           Skip fuzzy search when keyword less or equal than 3 characters
         </label>
-        <label nz-checkbox nzDisabled class="pt-5">Use lunr languages</label> <br>
+        <label [(ngModel)]="options.useReplaceSpecialCharacters" nzDisabled (ngModelChange)="onSearch()" nz-checkbox class="pt-5">
+          Supported special character
+          <i nz-icon nzType="info-circle" nzTheme="twotone" nz-tooltip [nzTooltipTitle]="specialCharacterTemplate"></i>
+          <ng-template #specialCharacterTemplate>
+            <div *ngFor="let item of SPECIAL_CHARACTERS">{{item.key}} to {{item.value}}</div>
+          </ng-template>
+        </label> 
+        <br>
+        <label nz-checkbox nzDisabled class="pl-3 pt-5">Use lunr languages</label> 
+        <br>
         <label nz-checkbox nzDisabled class="pl-3 pt-5">Search with exact number value</label>
       </div>
       <div nz-col nzSpan="12">
