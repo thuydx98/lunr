@@ -12,8 +12,9 @@ This project was developed with [Angular CLI](https://github.com/angular/angular
 - [x] Apply  Levenshtein Distance by default
 - [x] Keep CSE, FWU as optional (keep current)
 - [x] Keep order by score as optional (keep current)
-- [ ] Try lunr language for English, France, German
+- [x] Try lunr language for English, France, German
 
 ## Improvement checklist
 - [ ] Create/Delete for input resource data
+- [ ] Update to ng zorro modal when input new pattern
 - [x] Find & fix the cause the UI freeze (1-3s) when re-render a big list data.

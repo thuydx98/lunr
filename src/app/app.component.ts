@@ -2,10 +2,30 @@ import { Component } from '@angular/core';
 import { InspectionService } from './inspection.service';
 import { TransferItem } from 'ng-zorro-antd/transfer';
 import { NzModalService } from 'ng-zorro-antd/modal';
-import * as lunr from 'lunr';
+import * as Lunr  from 'lunr';
 import Fuse from 'fuse.js';
 import { SearchOption } from './models/app.model';
 import { similarity, searchExactly, SPECIAL_CHARACTERS } from './app.const';
+
+const trimmer = function (token: any) {
+  return token.update(function (s: any) {
+    return s;
+  });
+};
+
+Lunr.Pipeline.registerFunction(trimmer, 'trimmer');
+
+type LunrIndex = (config: Lunr.ConfigFunction) => Lunr.Index;
+type LunrType = LunrIndex & {
+  de: any;
+  fr: any;
+};
+
+const lunr: LunrType = require('lunr');
+require('lunr-languages/lunr.stemmer.support.js')(lunr);
+require('lunr-languages/lunr.multi.js')(lunr);
+require('lunr-languages/lunr.de.js')(lunr);
+require('lunr-languages/lunr.fr.js')(lunr);
 
 @Component({
   selector: 'app-root',
@@ -222,18 +242,12 @@ export class AppComponent {
   }
 
   private initLunrIndex(inspections: any): void {
-    const trimmer = function (token: any) {
-      return token.update(function (s: any) {
-        return s;
-      });
-    };
-
-    lunr.Pipeline.registerFunction(trimmer, 'trimmer');
-
     this.idx = lunr(function () {
+      this.use(lunr.fr, lunr.de);
       this.ref('inspectionId');
       this.field('inspectionLineName');
       this.metadataWhitelist = ['position', 'tokenLength'];
+      
       inspections.forEach((ins: any) => {
         let inspectionLineName = ins.inspectionLineName;
         SPECIAL_CHARACTERS.forEach((item) => {
