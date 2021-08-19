@@ -3,7 +3,6 @@ import { InspectionService } from './inspection.service';
 import { TransferItem } from 'ng-zorro-antd/transfer';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import * as Lunr from 'lunr';
-import Fuse from 'fuse.js';
 import { SearchOption } from './models/app.model';
 import { similarity, searchExactly, SPECIAL_CHARACTERS } from './app.const';
 
@@ -39,7 +38,6 @@ export class AppComponent {
   rawInspection: any[] = [];
   inspections: any[] = [];
   idx: any;
-  fuse: any;
   options: SearchOption = new SearchOption();
 
   constructor(private appSettingsService: InspectionService, private modal: NzModalService) {}
@@ -87,7 +85,7 @@ export class AppComponent {
   onSearch(isChangeScore = false): void {
     const patterns = this.patterns.filter((item) => item.direction === 'right');
 
-    if (!this.searchKey || (patterns.length == 0 && !this.options.useCustomSearch && !this.options.useUpperWord && !this.options.useFuse)) {
+    if (!this.searchKey || (patterns.length == 0 && !this.options.useCustomSearch && !this.options.useUpperWord)) {
       this.inspections = this.rawInspection;
       return;
     }
@@ -104,10 +102,6 @@ export class AppComponent {
       const input = '+' + [...searchKey].join('* +') + '*';
       result = result.concat(this.idx.search(input).map((item: any) => ({ ...item, tooltip: input, plugin: 'FWU' })));
     }
-
-    // if (this.options.useFuse) {
-    //   result = result.concat(this.searchFuse(searchKey));
-    // }
 
     patterns.forEach((pattern) => {
       const tooltip = pattern.title;
@@ -132,16 +126,14 @@ export class AppComponent {
           inspection.tooltip = item.tooltip;
           inspection.rawName = inspection.inspectionLineName;
 
-          if (item.plugin !== 'FUSE') {
-            for (let [key] of Object.entries(item.matchData.metadata)) {
-              if (this.options.useReplaceSpecialCharacters) {
-                SPECIAL_CHARACTERS.forEach((item) => {
-                  key = key.split(item.value).join(item.key);
-                });
-              }
-
-              inspection.inspectionLineName = inspection.inspectionLineName.replace(new RegExp(key, 'i'), `<b>$&</b>`);
+          for (let [key] of Object.entries(item.matchData.metadata)) {
+            if (this.options.useReplaceSpecialCharacters) {
+              SPECIAL_CHARACTERS.forEach((item) => {
+                key = key.split(item.value).join(item.key);
+              });
             }
+
+            inspection.inspectionLineName = inspection.inspectionLineName.replace(new RegExp(key, 'i'), `<b>$&</b>`);
           }
 
           inspection.inspectionLineName = `<span class="text-danger">` + (item.plugin ? item.plugin + ' ' : '') + (item.score < 100 ? +item.score.toFixed(3).toString() : '') + `</span>: ` + inspection.inspectionLineName;
@@ -271,34 +263,5 @@ export class AppComponent {
         this.add({ ...ins, inspectionLineName });
       });
     });
-  }
-
-  private initFuse(inspections: any): void {
-    this.fuse = new Fuse(inspections, {
-      isCaseSensitive: true,
-      includeScore: true,
-      shouldSort: true,
-      includeMatches: true,
-      findAllMatches: true,
-      // minMatchCharLength: 1,
-      // location: 0,
-      threshold: 0.6,
-      // distance: 100,
-      // useExtendedSearch: false,
-      // ignoreLocation: false,
-      // ignoreFieldNorm: false,
-      keys: ['inspectionLineName'],
-    });
-  }
-
-  private searchFuse(searchKey: string): any[] {
-    const result = this.fuse.search(searchKey);
-    debugger;
-    return result.map((item: any) => ({
-      ref: item.item.inspectionId,
-      tooltip: 'Fuse.js',
-      score: item.score,
-      plugin: 'FUS',
-    }));
   }
 }
