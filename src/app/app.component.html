@@ -32,23 +32,8 @@
 
     <div nz-row>
       <div nz-col nzSpan="12">
-        <label [(ngModel)]="options.useLevenshtein" (ngModelChange)="onSearch()" nz-checkbox class="pl-3 pt-5">
-          Use Levenshtein Distance to sort inspection with same score
-        </label>
-        <label [(ngModel)]="options.useCustomSearch" (ngModelChange)="onSearch()" nz-checkbox class="pt-5">
-          Use custom search exact for multi language (not use ext lib) (<span class="text-danger">CSE</span>)
-        </label>
-        <!-- <label [(ngModel)]="options.useFuse" (ngModelChange)="onSearch()" nz-checkbox class="pt-5">
-          Use Fuse.js fuzzy search library https://fusejs.io (<span class="text-danger">FUS</span>)
-        </label> -->
-        <label [(ngModel)]="options.useUpperWord" (ngModelChange)="onSearch()" nz-checkbox class="pt-5">
-          Search by first letter of each word in uppercase (<span class="text-danger">FWU</span>)
-        </label>
-        <label nz-checkbox class="pt-5">
-          Skip fuzzy search when keyword less or equal than 3 characters
-        </label>
         <label [(ngModel)]="options.useReplaceSpecialCharacters" nzDisabled (ngModelChange)="onSearch()" nz-checkbox
-          class="pt-5">
+          class="pl-3 pt-5">
           Supported special character
           <i nz-icon nzType="info-circle" nzTheme="twotone" nz-tooltip [nzTooltipTitle]="specialCharacterTemplate"></i>
           <ng-template #specialCharacterTemplate>
@@ -56,8 +41,36 @@
           </ng-template>
         </label>
         <br>
-        <label nz-checkbox nzDisabled class="pl-3 pt-5">Use lunr languages</label>
+
+        <label [(ngModel)]="options.useLevenshtein" (ngModelChange)="onSearch()" nz-checkbox class="pl-3 pt-5">
+          Use Levenshtein Distance to sort inspection with same score
+        </label>
         <br>
+
+        <label [(ngModel)]="options.useLunrLanguages" (ngModelChange)="onUseLunrLanguages()" nz-checkbox class="pl-3 pt-5">
+          Use lunr languages
+        </label>
+        <br>
+
+        <label [(ngModel)]="options.useCustomSearch" (ngModelChange)="onSearch()" nz-checkbox class="pl-3 pt-5">
+          Use custom search exact for multi language (not use ext lib) (<span class="text-danger">CSE</span>)
+        </label>
+        <br>
+
+        <!-- <label [(ngModel)]="options.useFuse" (ngModelChange)="onSearch()" nz-checkbox class="pt-5">
+          Use Fuse.js fuzzy search library https://fusejs.io (<span class="text-danger">FUS</span>)
+        </label> -->
+
+        <label [(ngModel)]="options.useUpperWord" (ngModelChange)="onSearch()" nz-checkbox class="pl-3 pt-5">
+          Search by first letter of each word in uppercase (<span class="text-danger">FWU</span>)
+        </label>
+        <br>
+
+        <label nz-checkbox class="pl-3 pt-5">
+          Skip fuzzy search when keyword less or equal than 3 characters
+        </label>
+        <br>
+
         <label nz-checkbox nzDisabled class="pl-3 pt-5">Search with exact number value</label>
       </div>
       <div nz-col nzSpan="12">

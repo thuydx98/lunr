@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { InspectionService } from './inspection.service';
 import { TransferItem } from 'ng-zorro-antd/transfer';
 import { NzModalService } from 'ng-zorro-antd/modal';
-import * as Lunr  from 'lunr';
+import * as Lunr from 'lunr';
 import Fuse from 'fuse.js';
 import { SearchOption } from './models/app.model';
 import { similarity, searchExactly, SPECIAL_CHARACTERS } from './app.const';
@@ -203,6 +203,11 @@ export class AppComponent {
     });
   }
 
+  onUseLunrLanguages(): void {
+    this.initLunrIndex(this.rawInspection);
+    this.onSearch();
+  }
+
   private generateSearchPatterns(searchKey: string): void {
     searchKey = searchKey?.replace(/\s\s+/g, ' ').trim();
 
@@ -242,12 +247,16 @@ export class AppComponent {
   }
 
   private initLunrIndex(inspections: any): void {
+    const isUseLunrLanguages = this.options.useLunrLanguages;
     this.idx = lunr(function () {
-      this.use(lunr.fr, lunr.de);
+      if (isUseLunrLanguages) {
+        this.use(lunr.fr, lunr.de);
+      }
+
       this.ref('inspectionId');
       this.field('inspectionLineName');
       this.metadataWhitelist = ['position', 'tokenLength'];
-      
+
       inspections.forEach((ins: any) => {
         let inspectionLineName = ins.inspectionLineName;
         SPECIAL_CHARACTERS.forEach((item) => {
