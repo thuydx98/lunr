@@ -17,8 +17,7 @@ Lunr.Pipeline.registerFunction(trimmer, 'trimmer');
 
 type LunrIndex = (config: Lunr.ConfigFunction) => Lunr.Index;
 type LunrType = LunrIndex & {
-  de: any;
-  fr: any;
+  multiLanguage: any;
 };
 
 const lunr: LunrType = require('lunr');
@@ -50,7 +49,6 @@ export class AppComponent {
       this.inspections = data;
       this.rawInspection = data;
       this.initLunrIndex(data);
-      // this.initFuse(data);
     });
   }
 
@@ -135,7 +133,13 @@ export class AppComponent {
           inspection.rawName = inspection.inspectionLineName;
 
           if (item.plugin !== 'FUSE') {
-            for (const [key] of Object.entries(item.matchData.metadata)) {
+            for (let [key] of Object.entries(item.matchData.metadata)) {
+              if (this.options.useReplaceSpecialCharacters) {
+                SPECIAL_CHARACTERS.forEach((item) => {
+                  key = key.split(item.value).join(item.key);
+                });
+              }
+
               inspection.inspectionLineName = inspection.inspectionLineName.replace(new RegExp(key, 'i'), `<b>$&</b>`);
             }
           }
@@ -251,7 +255,7 @@ export class AppComponent {
     const isUseLunrLanguages = this.options.useLunrLanguages;
     this.idx = lunr(function () {
       if (isUseLunrLanguages) {
-        this.use(lunr.fr, lunr.de);
+        this.use(lunr.multiLanguage('en', 'fr', 'de'));
       }
 
       this.ref('inspectionId');
