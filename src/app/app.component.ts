@@ -243,7 +243,8 @@ export class AppComponent {
        */
     }
 
-    this.patterns = patterns;
+    this.patterns = patterns.map((item: any) => ({ ...item, direction: 'right' }));
+    this.onSearch();
   }
 
   private initLunrIndex(inspections: any): void {
