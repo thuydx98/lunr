@@ -47,15 +47,16 @@
         <label nz-checkbox class="pt-5">
           Skip fuzzy search when keyword less or equal than 3 characters
         </label>
-        <label [(ngModel)]="options.useReplaceSpecialCharacters" nzDisabled (ngModelChange)="onSearch()" nz-checkbox class="pt-5">
+        <label [(ngModel)]="options.useReplaceSpecialCharacters" nzDisabled (ngModelChange)="onSearch()" nz-checkbox
+          class="pt-5">
           Supported special character
           <i nz-icon nzType="info-circle" nzTheme="twotone" nz-tooltip [nzTooltipTitle]="specialCharacterTemplate"></i>
           <ng-template #specialCharacterTemplate>
             <div *ngFor="let item of SPECIAL_CHARACTERS">{{item.key}} to {{item.value}}</div>
           </ng-template>
-        </label> 
+        </label>
         <br>
-        <label nz-checkbox nzDisabled class="pl-3 pt-5">Use lunr languages</label> 
+        <label nz-checkbox nzDisabled class="pl-3 pt-5">Use lunr languages</label>
         <br>
         <label nz-checkbox nzDisabled class="pl-3 pt-5">Search with exact number value</label>
       </div>
@@ -75,12 +76,18 @@
     </div>
   </div>
 
-  <div nz-col nzSpan="6">
-    <ul nz-list [nzDataSource]="inspections" nzBordered nzSize="large" [nzLoading]="loading">
-      <li nz-list-item *ngFor="let item of inspections">
-        <span nz-tooltip [nzTooltipTitle]="item.tooltip" [innerHTML]="item.inspectionLineName"></span>
-      </li>
-      <nz-list-footer> Result: {{inspections.length}} items </nz-list-footer>
-    </ul>
+  <div nz-col nzSpan="6" style="border: 1px solid #d9d9d9;">
+    <cdk-virtual-scroll-viewport itemSize="10">
+      <div *cdkVirtualFor="let item of inspections" nz-tooltip [nzTooltipTitle]="item.tooltip"
+        [innerHTML]="item.inspectionLineName" class="list-item"></div>
+
+      <nz-empty *ngIf="inspections.length === 0" class="mt-5"
+        nzNotFoundImage="https://gw.alipayobjects.com/zos/antfincdn/ZHrcdLPrvN/empty.svg" nzNotFoundContent="No result">
+      </nz-empty>
+
+    </cdk-virtual-scroll-viewport>
+    <div class="list-item">
+      Total: {{inspections.length}}
+    </div>
   </div>
 </div>

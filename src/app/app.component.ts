@@ -16,7 +16,6 @@ export class AppComponent {
   SPECIAL_CHARACTERS = SPECIAL_CHARACTERS;
   timeoutID: any;
   searchKey = '';
-  loading = true;
   patterns: TransferItem[] = [];
   rawInspection: any[] = [];
   inspections: any[] = [];
@@ -30,7 +29,6 @@ export class AppComponent {
     this.appSettingsService.get().subscribe((data) => {
       this.inspections = data;
       this.rawInspection = data;
-      this.loading = false;
       this.initLunrIndex(data);
       // this.initFuse(data);
     });
@@ -43,7 +41,6 @@ export class AppComponent {
 
     this.patterns = this.patterns.concat(items);
 
-    this.loading = true;
     if (this.timeoutID) clearTimeout(this.timeoutID);
 
     this.timeoutID = setTimeout(() => this.onSearch(), 500);
@@ -67,16 +64,13 @@ export class AppComponent {
     this.searchKey = '';
     this.patterns = [];
     this.inspections = this.rawInspection;
-    this.loading = false;
   }
 
   onSearch(isChangeScore = false): void {
-    this.loading = true;
     const patterns = this.patterns.filter((item) => item.direction === 'right');
 
     if (!this.searchKey || (patterns.length == 0 && !this.options.useCustomSearch && !this.options.useUpperWord && !this.options.useFuse)) {
       this.inspections = this.rawInspection;
-      this.loading = false;
       return;
     }
 
@@ -158,8 +152,6 @@ export class AppComponent {
     if (this.options.isSortScore) {
       this.inspections = this.inspections.sort((a, b) => (a.score <= b.score && 1) || -1);
     }
-
-    this.loading = false;
   }
 
   onAddPattern(direction: any): void {

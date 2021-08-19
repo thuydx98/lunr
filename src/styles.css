@@ -1,6 +1,11 @@
-nz-spin {
+cdk-virtual-scroll-viewport {
   height: calc(100vh - 100px);
-  overflow-y: auto;
+}
+
+.list-item {
+  padding: 16px 24px;
+  border-top: 1px solid #f0f0f0;
+  font-variant: tabular-nums;
 }
 
 .text-danger {
@@ -13,6 +18,10 @@ nz-spin {
 
 .ml-3 {
   margin-left: 8px;
+}
+
+.mt-5 {
+  margin-top: 64px;
 }
 
 .pl-3 {

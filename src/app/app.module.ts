@@ -12,12 +12,13 @@ import { NzGridModule } from 'ng-zorro-antd/grid';
 import { NzTransferModule } from 'ng-zorro-antd/transfer';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzIconModule } from 'ng-zorro-antd/icon';
-import { NzListModule } from 'ng-zorro-antd/list';
+import { NzEmptyModule } from 'ng-zorro-antd/empty';
 import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
+import { ScrollingModule } from '@angular/cdk/scrolling';
 
 registerLocaleData(en);
 
@@ -32,12 +33,13 @@ registerLocaleData(en);
     NzTransferModule,
     NzInputModule,
     NzIconModule,
-    NzListModule,
+    NzEmptyModule,
     NzToolTipModule,
     NzCheckboxModule,
     NzButtonModule,
     NzModalModule,
     NzInputNumberModule,
+    ScrollingModule,
   ],
   providers: [
     { provide: NZ_I18N, useValue: en_US },

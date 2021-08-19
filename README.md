@@ -15,5 +15,5 @@ This project was developed with [Angular CLI](https://github.com/angular/angular
 - [ ] Try lunr language for English, France, German
 
 ## Improvement checklist
-- [ ] Create/Delete for input resource
-- [ ] Find the cause the UI freeze (1-3s) when re-render a big list data.
+- [ ] Create/Delete for input resource data
+- [x] Find & fix the cause the UI freeze (1-3s) when re-render a big list data.
