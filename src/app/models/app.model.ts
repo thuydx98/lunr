@@ -6,4 +6,5 @@ export class SearchOption {
   public minScore = 0;
   public useReplaceSpecialCharacters = true;
   public useLunrLanguages = true;
+  public useUnicodeNormalizer = false;
 }

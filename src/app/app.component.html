@@ -47,9 +47,14 @@
         </label>
         <br>
 
-        <label [(ngModel)]="options.useLunrLanguages" (ngModelChange)="onUseLunrLanguages()" nz-checkbox class="pl-3 pt-5">
+        <label [(ngModel)]="options.useLunrLanguages" (ngModelChange)="onInitLunr()" nz-checkbox class="pl-3 pt-5">
           Use lunr languages
           <i nz-icon nzType="info-circle" nzTheme="twotone" nz-tooltip nzTooltipTitle="English, France, German"></i>
+        </label>
+        <br>
+
+        <label [(ngModel)]="options.useUnicodeNormalizer" (ngModelChange)="onInitLunr()" nz-checkbox class="pl-3 pt-5">
+          Use unicode normalizer
         </label>
         <br>
 

@@ -5,6 +5,7 @@ import { NzModalService } from 'ng-zorro-antd/modal';
 import * as Lunr from 'lunr';
 import { SearchOption } from './models/app.model';
 import { similarity, searchExactly, SPECIAL_CHARACTERS } from './app.const';
+import { convertUnicodeNormalizer } from './helper/lunr-unicode-normalizer';
 
 const trimmer = function (token: any) {
   return token.update(function (s: any) {
@@ -199,7 +200,8 @@ export class AppComponent {
     });
   }
 
-  onUseLunrLanguages(): void {
+  onInitLunr(): void {
+    this.generateSearchPatterns(this.searchKey);
     this.initLunrIndex(this.rawInspection);
     this.onSearch();
   }
@@ -209,6 +211,10 @@ export class AppComponent {
 
     if (!searchKey || searchKey === '') {
       return;
+    }
+
+    if (this.options.useUnicodeNormalizer) {
+      searchKey = convertUnicodeNormalizer(searchKey);
     }
 
     SPECIAL_CHARACTERS.forEach((item) => {
@@ -244,9 +250,11 @@ export class AppComponent {
   }
 
   private initLunrIndex(inspections: any): void {
-    const isUseLunrLanguages = this.options.useLunrLanguages;
+    const useLunrLanguages = this.options.useLunrLanguages;
+    const useUnicodeNormalizer = this.options.useUnicodeNormalizer;
+
     this.idx = lunr(function () {
-      if (isUseLunrLanguages) {
+      if (useLunrLanguages) {
         this.use(lunr.multiLanguage('en', 'fr', 'de'));
       }
 
@@ -256,6 +264,10 @@ export class AppComponent {
 
       inspections.forEach((ins: any) => {
         let inspectionLineName = ins.inspectionLineName;
+        if (useUnicodeNormalizer) {
+          inspectionLineName = convertUnicodeNormalizer(inspectionLineName);
+        }
+
         SPECIAL_CHARACTERS.forEach((item) => {
           inspectionLineName = inspectionLineName.split(item.key).join(item.value);
         });
