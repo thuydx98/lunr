@@ -13,6 +13,7 @@ This project was developed with [Angular CLI](https://github.com/angular/angular
 - [x] Keep CSE, FWU as optional (keep current)
 - [x] Keep order by score as optional (keep current)
 - [x] Try lunr language for English, France, German
+- [x] Add unicode normalizer
 
 ## Improvement checklist
 - [ ] Create/Delete for input resource data
